@@ -35,13 +35,17 @@ Union of Intersections (UoI) for Interpretable Data Driven Discovery and Predict
 }
 
 
-\author{Pratik S. Sachdeva$^{1}$ and Kristofer E. Bouchard$^{2}$% <-this % stops a space
-\thanks{$^{1}$Albert Author is with Faculty of Electrical Engineering, Mathematics and Computer Science,
-        University of California, Berkeley, 7500 AE Enschede, The Netherlands
-        {\tt\small albert.author@papercept.net}}%
-\thanks{$^{2}$Bernard D. Researcheris with the Department of Electrical Engineering, Wright State University,
-        Dayton, OH 45435, USA
-        {\tt\small b.d.researcher@ieee.org}}%
+\author{
+    Pratik S. Sachdeva$^{1}$ and Kristofer E. Bouchard$^{1,2*}$%
+    \thanks{
+        $^{1}$Redwood Center for Theoretical Neuroscience, UC Berkeley
+    }%
+    \thanks{
+        $^{2}$Lawrence Berkeley National Laboratory
+    }%
+    \thanks{
+        $^*$Corresponding author
+    }%
 }
 
 
@@ -57,16 +61,18 @@ Union of Intersections (UoI) for Interpretable Data Driven Discovery and Predict
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
 
-The increasing size and complexity of scientific data could dramatically enhance discovery and prediction for basic scientific applications. Realizing this potential, however, requires novel statistical analysis methods that are both interpretable and predictive. We introduce Union of Intersections (UoI), a flexible, modular, and scalable framework for enhanced model selection and estimation. Methods based on UoI perform model selection and model estimation through intersection and union operations, respectively. We show that UoI-based methods achieve low-variance and nearly unbiased estimation of a small number of interpretable features, while maintaining high-quality prediction accuracy. We perform extensive numerical investigation to evaluate a UoI algorithm (UoI$_{\text{Lasso}}$) on synthetic and real data. In doing so, we demonstrate the extraction of interpretable functional networks from human electrophysiology recordings as well as accurate prediction of phenotypes from genotype-phenotype data with reduced features. These results suggest that methods based on the UoI framework could improve interpretation and prediction in data-driven discovery in a variety of biomedical applications.
+Interpretable and predictive statistical data analysis methods can provide insight into the biological processes that generate neuroscience data. Neuroscience applications include network formation, receptive field estimation, determination of the genetic control of behaviors, and the calculation of meaningful low-dimensional representations. However, commonly used statistical inference procedures generally fail to identify the correct features, and further introduce consequential bias in the estimates. To address these issues, we developed Union of Intersections (UoI)1, a flexible, modular, and scalable framework for enhanced statistical feature selection and estimation. Methods (e.g., regression, classification, dimensionality reduction) based on UoI perform feature selection and feature estimation through intersection and union operations, respectively. In the context of linear regression (specifically UoILASSO), we summarize formal statistical proofs and extensive numerical investigation on synthetic data to demonstrate tight control of false-positives and false-negatives in feature selection with low-bias and low-variance estimates of selected parameters, while maintaining high-quality prediction accuracy (in the sense of cross-validation). In neuroscience data, we demonstrate: (i) the extraction of sparse, predictive, and interpretable functional networks from human ECoG during speech production and non-human primate single-unit recordings; (ii) increased model parsimony of spatio-temporal receptive fields from retinal ganglion cells; (iii) sparse genetic control of complex behavioral phenotypes; and (iv) parts-based decomposition (NMF) of neural spectrograms. Through optimization of single-node performance as well as multi-node scaling, we demonstrate the application of UoI to 4TB sized data sets in 45 minutes on a supercomputer2. To highlight the generality of the UoI framework, we show (with UoILogistic, UoICUR, and UoIVAR variants of the framework) improved prediction parsimony for classification, accurate matrix factorization, and dynamic modeling on diverse neuroscientific datasets1,3. These results demonstrate that UoI improves interpretation and prediction across diverse neuroscience applications. 
 
 \end{abstract}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{INTRODUCTION}
+The increasing size and complexity of biomedical and neuroscientific data could dramatically enhance basic discovery. Realizing this potential requires novel statistical analysis methods that are both interpretable and predictive. By \textit{interpretable}, we mean that one can interpret the output of the method in terms of processes generating the data. This typically requires identification of a small number of elements of the actual data (sparsity) and accurate estimation of their contribution (low-bias and low-variance). By \textit{predictive}, we mean optimizing the performance of some machine learning measure such as precision, recall, etc. There is often a trade-off between interpretability and predictive power, and methods that satisfy both are lacking. This tradeoff is particularly acute for neuroscientific applications, where the output of the model is used to provide insight into neurobiological functions. For example, in estimating networks from data (i.e., ‘functional connectomics’), a core problem is determining the adjacency matrix; statistically, this is equivalent to feature selection (i.e., which edges are non-zero). While ad-hoc thresholding can be performed, such approaches are often set by hand and defy rigorous understanding. Likewise, statistically biased estimates can result in incorrectly inferred dynamics or under-estimated spike rates. These issues are fundamental to many neuroscientific data analyses and the interpretation thereof.  
 
+Here, we present the Union of Intersections (UoI) framework, a novel statistical approach we have recently introduced, addresses these issues. In several real neuroscience data sets solving diverse real neuroscience analysis problems, we show qualitatively and quantitatively different results when using UoI-based methods compared to ‘standard’ methods. The algorithms enhanced by UoI (e.g., regression, classification, dimensionality reduction) are ubiquitous in systems neuroscience. Thus, the foundational statistical improvements of UoI-based methods will potentially have significant impacts across neuroscience.
 \section{METHODS}
-
+UoI is not a single method or algorithm but a flexible statistical framework into which other algorithms (regression: LASSO; classification: Logistic; dimensionality reduction: CUR/NMF; dynamics: Vector Autoregressive models) can be inserted. UoI-based methods leverage stochastic data resampling and a range of sparsity-inducing regularization parameters/dimensions to build families of potential feature sets robust to resamples (i.e., perturbations) of the data, and then average nearly unbiased parameter estimates of selected features to maximize predictive accuracy.
 \section{RESULTS}
 
 \section{CONCLUSION}
@@ -84,6 +90,10 @@ It may be used for A4 paper size if the paper size setting is suitably modified.
     \scalebox{0.55}{\includegraphics{./img/Fig1/Fig1}}
 \end{figure}
 
+\begin{figure}[b]
+    \centering
+    \scalebox{0.51}{\includegraphics{./img/Fig2/Fig2}}
+\end{figure}
 \subsection{Maintaining the Integrity of the Specifications}
 
 The template is used to format your paper and style the text. All margins, column widths, line spaces, and text fonts are prescribed; please do not alter them. You may note peculiarities. For example, the head margin in this template measures proportionately more than is customary. This measurement and others are deliberate, using specifications that anticipate your paper as one part of the entire proceedings, and not as an independent document. Please do not revise any of the current designations
@@ -217,7 +227,7 @@ References are important to the reader; therefore, each citation must be complet
 
 \begin{thebibliography}{99}
 
-\bibitem{c1} G. O. Young, �Synthetic structure of industrial plastics (Book style with paper title and editor),� 	in Plastics, 2nd ed. vol. 3, J. Peters, Ed.  New York: McGraw-Hill, 1964, pp. 15�64.
+\bibitem{c1} G. O. Young, Synthetic structure of industrial plastics (Book style with paper title and editor), in Plastics, 2nd ed. vol. 3, J. Peters, Ed.  New York: McGraw-Hill, 1964, pp. 15�64.
 \bibitem{c2} W.-K. Chen, Linear Networks and Systems (Book style).	Belmont, CA: Wadsworth, 1993, pp. 123�135.
 \bibitem{c3} H. Poor, An Introduction to Signal Detection and Estimation.   New York: Springer-Verlag, 1985, ch. 4.
 \bibitem{c4} B. Smith, �An approach to graphs of linear forms (Unpublished work style),� unpublished.
