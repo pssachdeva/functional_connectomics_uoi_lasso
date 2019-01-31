@@ -85,16 +85,27 @@ The increasing size and complexity of neuroscientific and biomedical data could 
 An important neuroscientific application that requires is network estimation from data (i.e., ``functional connectomics''). In functional connectomics, a core problem is determining the adjacency matrix. Statistically, this is equivalent to feature selection (i.e., which edges are non-zero, Fig.  \ref{fig:intro}b). While ad-hoc thresholding can be performed, such approaches are often set by hand and defy rigorous understanding. Likewise, statistically biased estimates can result in incorrectly inferred dynamics or under-estimated spike rates. These issues are fundamental to many neuroscientific data analyses and the interpretation thereof.
 
 \begin{figure}[b!]
-    \vspace{-20pt}
+    \vspace{-15pt}
     \centering
-    \scalebox{0.55}{\includegraphics{./img/Fig1/Fig1}}
-    \caption{Estimation of ground truth parameters over bootstraps of the data ($B_i$). \textbf{a} Poor selection results in false positives and false negatives. \textbf{b} Poor estimation results in high bias and high variance.}
+    \scalebox{0.54}{\includegraphics{./img/Fig1/Fig1}}
+    \vspace{-20pt}
+    \caption{Estimation of ground truth parameters over resamples of the data ($R_i$). \textbf{a.} Poor selection results in false positives and false negatives. \textbf{b.} Poor estimation results in high bias and high variance.}
     \label{fig:intro}
 \end{figure}
 
 We present the Union of Intersections (UoI) framework, a novel statistical approach we have recently introduced that addresses these issues \cite{uoi}. The algorithms enhanced by UoI (e.g., regression, classification, dimensionality reduction) are ubiquitous in systems neuroscience. Here, in real neuroscience analysis problems, we demonstrate qualitatively and quantitatively different results when using UoI-based methods compared to ``standard'' methods.  Thus, the foundational statistical improvements of UoI-based methods will potentially have significant impacts across neuroscience.
+
+\begin{figure}[t!]
+    \vspace{-15pt}
+    \centering
+    \scalebox{0.54}{\includegraphics{./img/Fig2/Fig2}}
+    \vspace{-20pt}
+    \caption{Functional Coupling}
+    \label{fig:intro}
+\end{figure}
+
 \section{METHODS}
-\subsection{Human }
+\subsection{Human Electro-corticography}
 
 \subsection{Nonhuman Primate Single-Unit Activity}
 We considered single-unit spiking activity from primary motor cortex (M1) of Macaque monkey during self-paced reaches on a grid ($p=196$ single-units) \cite{nhp}. We binned the spike counts at 500 milliseconds and applied a square-root transform to stabilize the variance (resulting in $n=1716$ samples). The fitted parameters $\beta_{ij}$ detail the coupling structure for the population of neurons.
@@ -121,7 +132,7 @@ model selection through intersection (compressive) operations and model estimati
 Thus, the selection module ensures that, for each $\lambda_j$, only features that are stable to perturbations in the data (resamples) are allowed in the support $S_j$. Meanwhile, the estimation module ensures that only the predictive supports are averaged together in the final model. The degree of feature compression via intersections (quantified by $N_S$) and the degree of feature expansion via unions (quantified by $N_E$) can be balanced to maximize prediction accuracy for the response variable $y$.
 \begin{figure}[t]
     \centering
-    \scalebox{0.50}{\includegraphics{./img/Fig2/Fig2}}
+    \scalebox{0.50}{\includegraphics{./img/Fig3/Fig3}}
     \vspace{-10pt}
     \begin{algorithmic}[1]
         \renewcommand{\algorithmicrequire}{\textbf{Input:}}
@@ -176,7 +187,7 @@ To validate the performance of the UoI$_{\text{Lasso}}$ algorithm, we performed 
 We examined the performance of these algorithms across a variety of underlying distributions of model parameters, degrees of sparsity, and noise levels. Across all algorithms examined, we found that UoI$_{\text{Lasso}}$ (Fig. \ref{fig:simulated}, black) possessed: very high selection accuracy (Fig. \ref{fig:simulated}a); parameter estimates with low error, (Fig. \ref{fig:simulated}b); the best prediction accuracy,  and superior estimation variability as quantified by parameter variance, (Fig. \ref{fig:simulated}d). Additionally, UoI$_{\text{Lasso}}$'s high selection accuracy manifested as the most accurate model size (Fig. \ref{fig:simulated}e), which, in combination with its prediction accuracy, resulted in the best model parsimony as quantified by (Fig. \ref{fig:simulated}f). Overall, UoI$_{\text{Lasso}}$ was robust to differences in underlying parameter distribution, degree of sparsity, and magnitude of noise.
 \begin{figure}[t]
     \centering
-    \scalebox{1.05}{\includegraphics{./img/Fig3/Fig3}}
+    \scalebox{1.05}{\includegraphics{./img/Fig4/Fig4}}
     \caption{Performance of UoI (black) compared to other models (in order: Ridge, Lasso, SCAD, BoATS, debiased Lasso) on simulated data.}
     \label{fig:simulated}
 \end{figure}
@@ -186,7 +197,7 @@ We examined the performance of these algorithms across a variety of underlying d
 We sought to determine if the enhanced selection and estimation properties of UoI$_{\text{Lasso}}$ also improved its utility as a tool for data-driven discovery in complex, diverse neuroscience data sets. Thus, we tackled the problem of graph formation from multi-electrode ($p=86$ electrodes) neural recordings taken directly from the surface of the human brain during speech production ($n=45$ trials each) \cite{bouchard2013}. That is, the goal was to construct sparse neuroscientifically-meaningful graphs for further downstream analysis. To estimate functional connectivity, we calculated partial correlation graphs. The model was estimated independently for each electrode, and we compared the results of graphs estimated by UoI$_{\text{Lasso}}$ to the graphs estimated by SCAD. In Fig. \ref{fig:vsmc}a-b, we display the networks derived from recordings during the production of /b/ while speaking /ba/. We found that the UoI$_{\text{Lasso}}$ network (Fig. \ref{fig:vsmc}a) was much sparser than the SCAD network (Fig. \ref{fig:vsmc}b). Furthermore, the network extracted by UoI$_{\text{Lasso}}$ contained electrodes in the lip (dorsal vSMC), jaw (central vSMC), and larynx (ventral vSMC) regions, accurately reflecting the articulators engaged in the production of /b/ (Fig. \ref{fig:vsmc}c). The SCAD network (Fig. \ref{fig:vsmc}d) did not have any of these properties. This highlights the improved power of UoI$_{\text{Lasso}}$ to extract sparse graphs with functionally meaningful features relative to even some non-convex methods.
 \begin{figure}[t!]
     \centering
-    \scalebox{0.75}{\includegraphics{./img/Fig4/Fig4}}
+    \scalebox{0.75}{\includegraphics{./img/Fig5/Fig5}}
     \caption{\textbf{a, b} Partial correlation graphs obtained from UoI$_{\text{Lasso}}$ and SCAD, respectively. \textbf{c, d} The locations of the electrodes on vSMC. \textbf{e} Average relative prediction accuracy (compared to baseline) during the production of a consonant-vowel syllable. \textbf{f} Average selection ratio over the same time course.}
     \label{fig:vsmc}
 \end{figure}
@@ -200,7 +211,7 @@ A significant strength of UoI$_{\text{Lasso}}$ is its ability to accurately dedu
 We computed coupling models on the 196 nonhuman primate M1 single-units, using  Lasso and UoI$_{\text{Lasso}}$. UoI$_{\text{Lasso}}$ provided considerably sparser fits, as quantified by the selection ratio (Fig. \ref{fig:nhp}a). On average, UoI$_{\text{Lasso}}$ used 8 times fewer parameters than Lasso. However, UoI$_{\text{Lasso}}$ maintained the predictive quality across all the fits (Fig. \ref{fig:nhp}b). These two observations can be summarized succinctly with the BIC. The difference in BIC $(\Delta$BIC = BIC$_{\text{Lasso}}-$BIC$_{\text{UoI}})$ across the model fits is depicted in Fig. \ref{fig:nhp}c. Approximately a quarter of the fits exhibit little to no difference in BIC, indicating there is little evidence against the models provide by Lasso.  Meanwhile, about 70\% of the single-units have a difference in BIC of at least 10, indicating very strong evidence against Lasso as a descriptive model of the data \cite{kass1995}. Thus, UoI$_{\text{Lasso}}$ provides coupling networks that are as simple as possible, but no simpler. 
 \begin{figure}[t]
     \centering
-    \scalebox{0.5}{\includegraphics{./img/Fig5/Fig5}}
+    \scalebox{0.5}{\includegraphics{./img/Fig6/Fig6}}
     \vspace{-15pt}
     \caption{UoI$_{\text{Lasso}}$ generates more parsimonious coupling models of spiking data. Top left: Comparison of selection ratios (fraction of non-zero features) for each coupling fit. Each point represents one single-unit. Top right: Comparison of $R^2$ values for each coupling fit. Bottom: Difference in BIC between Lasso and UoI$_{\text{Lasso}}$.}
     \label{fig:nhp}
