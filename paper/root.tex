@@ -28,21 +28,33 @@
 %\usepackage{mathptmx} % assumes new font selection scheme installed
 %\usepackage{times} % assumes new font selection scheme installed
 \usepackage{amsmath} % assumes amsmath package installed
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+
 \usepackage{amssymb}  % assumes amsmath package installed
+\usepackage{algorithmic}
 
 \title{\LARGE \bf
-Union of Intersections (UoI) for Interpretable Data Driven Discovery and Prediction in Neuroscience
+Sparse, Predictive, and Interpretable Functional Connectomics with UoI$_{\text{Lasso}}$
 }
 
 
 \author{
-    Pratik S. Sachdeva$^{1}$ and Kristofer E. Bouchard$^{1,2*}$%
+    Pratik S. Sachdeva$^{1, 3}$, Sharmodeep Bhattacharyya$^{5}$, Kristofer E. Bouchard$^{1,2,3,4*}$%
     \thanks{
         $^{1}$Redwood Center for Theoretical Neuroscience, UC Berkeley
     }%
     \thanks{
-        $^{2}$Lawrence Berkeley National Laboratory
+        $^{2}$Helen Wills Neuroscience Institute, UC Berkeley
+    }
+    \thanks{
+        $^{3}$Biological Systems \& Engineering, Lawrence Berkeley National Lab
+    }
+    \thanks{
+        $^{4}$Computational Resources Division, Lawrence Berkeley National Lab
     }%
+    \thanks{
+        $^{5}$Department of Statistics, Oregon State University
+    }
     \thanks{
         $^*$Corresponding author
     }%
@@ -68,73 +80,108 @@ Interpretable and predictive statistical data analysis methods can provide insig
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{INTRODUCTION}
-The increasing size and complexity of biomedical and neuroscientific data could dramatically enhance basic discovery. Realizing this potential requires novel statistical analysis methods that are both interpretable and predictive. By \textit{interpretable}, we mean that one can interpret the output of the method in terms of processes generating the data. This typically requires identification of a small number of elements of the actual data (sparsity, Fig. \ref{fig:intro}c) and accurate estimation of their contribution (low-bias and low-variance, Fig. \ref{fig:intro}d). By \textit{predictive}, we mean optimizing the performance of some machine learning measure such as precision, recall, etc. There is often a trade-off between interpretability and predictive power, and methods that satisfy both are lacking. This tradeoff is particularly acute for neuroscientific applications, where the output of the model is used to provide insight into neurobiological functions. 
+The increasing size and complexity of neuroscientific and biomedical data could dramatically enhance basic discovery and prediction. Realizing this potential requires novel statistical analysis methods that are both interpretable and predictive. By \textit{interpretable}, we mean that one can interpret the output of the method in terms of processes generating the data. This typically requires identification of a small number of elements of the actual data (i.e., sparsity, Fig. \ref{fig:intro}a) and accurate estimation of their contribution (i.e., low-bias and low-variance, Fig. \ref{fig:intro}b). By \textit{predictive}, we mean optimizing the performance of some machine learning measure such as precision, recall, etc. There is often a trade-off between interpretability and predictive power, and methods that satisfy both are lacking. This tradeoff is particularly acute for neuroscientific applications, where the output of the model is used to provide insight into neurobiological functions. 
 
-For example, in estimating networks from data (i.e., ``functional connectomics''), a core problem is determining the adjacency matrix; statistically, this is equivalent to feature selection (i.e., which edges are non-zero, Fig.  \ref{fig:intro}b). While ad-hoc thresholding can be performed, such approaches are often set by hand and defy rigorous understanding. Likewise, statistically biased estimates can result in incorrectly inferred dynamics or under-estimated spike rates. These issues are fundamental to many neuroscientific data analyses and the interpretation thereof.
+An important neuroscientific application that requires is network estimation from data (i.e., ``functional connectomics''). In functional connectomics, a core problem is determining the adjacency matrix. Statistically, this is equivalent to feature selection (i.e., which edges are non-zero, Fig.  \ref{fig:intro}b). While ad-hoc thresholding can be performed, such approaches are often set by hand and defy rigorous understanding. Likewise, statistically biased estimates can result in incorrectly inferred dynamics or under-estimated spike rates. These issues are fundamental to many neuroscientific data analyses and the interpretation thereof.
 
 \begin{figure}[b!]
     \vspace{-20pt}
     \centering
     \scalebox{0.55}{\includegraphics{./img/Fig1/Fig1}}
-    \caption{\textbf{a} \textbf{b} Functional connectomics requires selecting and estimating non-zero edges. \textbf{c, d} Estimation of ground truth parameters over bootstraps of the data ($B_i$). Poor selection results in false positives and false negatives (\textbf{c}), while poor estimation results in high bias and high variance (\textbf{d}).}
+    \caption{Estimation of ground truth parameters over bootstraps of the data ($B_i$). \textbf{a} Poor selection results in false positives and false negatives. \textbf{b} Poor estimation results in high bias and high variance.}
     \label{fig:intro}
 \end{figure}
 
 We present the Union of Intersections (UoI) framework, a novel statistical approach we have recently introduced that addresses these issues \cite{uoi}. The algorithms enhanced by UoI (e.g., regression, classification, dimensionality reduction) are ubiquitous in systems neuroscience. Here, in real neuroscience analysis problems, we demonstrate qualitatively and quantitatively different results when using UoI-based methods compared to ``standard'' methods.  Thus, the foundational statistical improvements of UoI-based methods will potentially have significant impacts across neuroscience.
 \section{METHODS}
-UoI is not a single method or algorithm but a flexible statistical framework into which other algorithms (regression: Lasso; classification: Logistic Regression; dimensionality reduction: CUR/NMF; dynamics: Vector Autoregressive models) can be inserted. UoI-based methods leverage stochastic data resampling and a range of sparsity-inducing regularization parameters/dimensions to build families of potential feature sets robust to resamples (i.e., perturbations) of the data, and then average nearly unbiased parameter estimates of selected features to maximize predictive accuracy.
+\subsection{Human }
 
-For concreteness, we consider an application of UoI in the context of linear regression. Specifically, we consider the problem of estimating the parameters $\beta \in \mathbb{R}^p$ that map a $p$-dimensional vector of predictor variables $x \in \mathbb{R}^p$ to the observation variable $y\in \mathbb{R}$, when there are $n$ paired samples of $x$ and $y$ corrupted by i.i.d Gausian noise:
+\subsection{Nonhuman Primate Single-Unit Activity}
+We considered single-unit spiking activity from primary motor cortex (M1) of Macaque monkey during self-paced reaches on a grid ($p=196$ single-units) \cite{nhp}. We binned the spike counts at 500 milliseconds and applied a square-root transform to stabilize the variance (resulting in $n=1716$ samples). The fitted parameters $\beta_{ij}$ detail the coupling structure for the population of neurons.
+
+\subsection{Linear Regression and UoI$_{\text{Lasso}}$}
+UoI is not a single method or algorithm but a flexible statistical framework into which other algorithms can be inserted. UoI-based methods leverage stochastic data resampling and a range of sparsity-inducing regularization parameters to build families of potential feature sets robust to perturbations (i.e., resamples) of the data, and then average nearly unbiased parameter estimates of selected features to maximize predictive accuracy. In this work, we focus on the UoI framework applied to Lasso regression, or UoI$_{\text{Lasso}}$.
+
+Linear regression consists of estimating the parameters $\beta \in \mathbb{R}^p$ that map a $p$-dimensional vector of predictor variables $x \in \mathbb{R}^p$ to the observation variable $y\in \mathbb{R}$, when there are $n$ paired samples of $x$ and $y$ corrupted by i.i.d Gausian noise:
 $$
 y = \beta^T x + \epsilon
 $$
-where $\epsilon \sim \mathcal{N}(0, \sigma^2)$ for each sample. When the true $\beta$ is thought to be sparse, an estimate of $\beta$ (i.e. $\hat{\beta}$) can be found by solving a constrained optimization problem of the form
+where $\epsilon \sim \mathcal{N}(0, \sigma^2)$ for each sample. When the true $\beta$ is thought to be sparse, an estimate of $\beta$ (i.e., $\hat{\beta}$) can be found by solving a constrained optimization problem of the form
 $$
 \hat{\beta} \in \underset{\beta\in \mathbb{R}^p}{\text{argmin}} \sum_{i=1}^n(y_i - \beta x_i)^2 + \lambda |\beta|_1
 $$
-where $|\beta|_1$ is the L1-norm of the parameters. Typically, $\lambda$ is unknown and must be determined through cross-validation across a variety of hyperparameters $\left\{\lambda_j\right\}_{j=1}^k$.
+where $|\beta|_1$ is the $\ell_1$-norm of the parameters. Typically, $\lambda$ is unknown and must be determined through cross-validation across a variety of hyperparameters $\left\{\lambda_j\right\}_{j=1}^k$.
 
 The key mathematical idea underlying UoI is to perform
-model selection through intersection (compressive) operations and model estimation through union (expansive) operations, in that order. Thus, ``cross-validation'' is handled separately for selection and estimation. For UoI$_{\text{Lasso}}$, the procedure is as follows:
+model selection through intersection (compressive) operations and model estimation through union (expansive) operations, in that order. For UoI$_{\text{Lasso}}$, the procedure is as follows:
 \begin{itemize}
-    \item \textbf{Model Selection:} For each $\lambda_j$, generate Lasso estimates on $N_S$ resamples of the data. The selection profile $S_j$ (i.e. the set of non-zero parameters) for $\lambda_j$ consists of the features that persist in all model fits across the resamples (Fig. \ref{fig:uoi}, left).
-    \item \textbf{Model Estimation:} For each unique support $S_j$, perform Ordinary Least Squares (OLS) on $N_E$ resamples of the data. The final model is obtained by averaging across the supports that optimally predict held-out data for each resample (Fig. \ref{fig:uoi}, right). 
+    \item \textbf{Model Selection:} For each $\lambda_j$, generate Lasso estimates on $N_S$ resamples of the data. The support $S_j$ (i.e., the set of non-zero parameters) for $\lambda_j$ consists of the features that persist in all model fits across the resamples (Fig. \ref{fig:uoi}, left).
+    \item \textbf{Model Estimation:} For each support $S_j$, perform Ordinary Least Squares (OLS) on $N_E$ resamples of the data. The final model is obtained by averaging across the supports that optimally predict held-out data for each resample (Fig. \ref{fig:uoi}, right). 
 \end{itemize}
-Thus, the selection module ensures that, for each $\lambda_j$, only features that are stable to perturbations in the data (resamples) are allowed in the selection profile $S_j$. Meanwhile, the estimation module ensures that only the predictive selection profiles are averaged together in the final model. The degree of feature compression via intersections (quantified by $N_S$) and the degree of feature expansion via unions (quantified by $N_E$) can be balanced to maximize prediction accuracy of the sparsely estimated model parameters for the response variable $y$.
-\begin{figure}[b]
+Thus, the selection module ensures that, for each $\lambda_j$, only features that are stable to perturbations in the data (resamples) are allowed in the support $S_j$. Meanwhile, the estimation module ensures that only the predictive supports are averaged together in the final model. The degree of feature compression via intersections (quantified by $N_S$) and the degree of feature expansion via unions (quantified by $N_E$) can be balanced to maximize prediction accuracy for the response variable $y$.
+\begin{figure}[t]
     \centering
     \scalebox{0.50}{\includegraphics{./img/Fig2/Fig2}}
-    \caption{The Union of Intersections framework applied to Lasso.}
+    \vspace{-10pt}
+    \begin{algorithmic}[1]
+        \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+        \renewcommand{\algorithmicensure}{\textbf{Output:}}
+        \REQUIRE Data $X \in \mathbb{R}^{n\times p}$, $y \in \mathbb{R}^{n}$
+        \STATE \ \ \ \  Regularization strengths $\lambda \in \mathbb{R}^q$
+        \STATE \ \ \ \  Number of resamples $N_S$ and $N_E$
+        \STATE \ \ \ \  Loss function $L(\beta; X, y)$
+        \STATE \textit{Model Selection}
+        \FOR {$k = 1$ to $N_S$}
+            \STATE Generate resample $X^k$, $y^k$
+            \FOR {$\lambda_j \in \lambda$}
+                \STATE $\hat{\beta}^{jk}\leftarrow$ Lasso regression (penalty $\lambda_j$) of $y^k$ on $X^k$
+                \STATE $S_j^k \leftarrow \left\{i\right\}$ where $\hat{\beta}^{jk}_i \neq 0$
+            \ENDFOR
+        \ENDFOR
+        \FOR {$j = 1$ to $q$}
+            \STATE $\displaystyle S_j \leftarrow \bigcap_{k=1}^{N_S}S_j^k$
+        \ENDFOR
+        \STATE \textit{Model Estimation}
+        \FOR {$k=1$ to $N_B$}
+            \STATE Generate training resample $X_T^k$, $y_T^k$
+            \STATE Generate evaluation resample $X_E^k$, $y_E^k$
+            \FOR {$j=1$ to $q$}
+                \STATE $\hat{\beta}^k_{S_j} \leftarrow$ Least Squares Regression of $y^k$ on $X_{T, S_j}^k$
+                \STATE $\ell^k_{S_j} \leftarrow L(\hat{\beta}^k_{S_j}; X^k_{E, S_j}, y_E^k)$
+            \ENDFOR
+            \STATE $\hat{\beta}^k_S \leftarrow \underset{\hat{\beta}^k_{S_j}}{\argmin} \ L(\hat{\beta}^k_{S_j} ; X^k_{E, S_j}, y^k_E)$
+        \ENDFOR
+        \STATE $\hat{\beta}^* = \underset{j}{\text{median}}\left(\hat{\beta}_S^k\right)$
+        \RETURN $\hat{\beta}^*$ 
+    \end{algorithmic} 
+    \vspace{-8pt}
+    \caption{Top: The Union of Intersections framework applied to Lasso. Bottom: Pseudocode for UoI$_{\text{Lasso}}$}
     \label{fig:uoi}
 \end{figure}
+
+\subsection{Metrics}
+We evaluated all algorithms with the following metrics:
+\begin{itemize}
+    \item \textbf{Selection Accuracy:} $1-\frac{\vert S_{\hat{\beta}} \Delta S_{\beta}\vert}{|S_{\hat{\beta}}\vert + \vert S_{\beta} \vert}$, where $\Delta$ is the symmetric set difference operator and $|S|$ is the cardinality of $S$. This metric is bounded in $[0, 1]$, taking value $0$ if $S_{\hat{\beta}}$ and $S_{\beta}$ have no elements in common, and taking value $1$ iff they are identical.
+    \item \textbf{Selection Ratio:} Fraction of non-zero features. Alternatively, we refer to the model size, or the number of non-zero features.
+    \item \textbf{Estimation Error:} $\sqrt{\frac{1}{p} \sum (\beta_i - \hat{\beta}_i)^2}$ (i.e., rms error).
+    \item \textbf{Estimation variability:} $\text{var}[\hat{\beta}]$, taken across resamples of the data.
+    \item \textbf{Prediction Accuracy:} $\frac{\sum \left(y_i - \hat{y}_i\right)^2}{\sum \left(y_i - E[y]\right)^2}$ (i.e., $R^2$).
+    \item \textbf{Model Parsimony:} Bayesian Information Criterion (BIC), defined as $\text{BIC} = -2\log \hat{L} + |\hat{\beta}|_0 \log(n)$, where $\hat{L}$ is the likelihood of the test set and $|\cdot|_0$ denotes the $\ell_0$-norm. Lower BIC is indicative of a predictive model using fewer features and thus is preferred.
+\end{itemize}
 \section{RESULTS}
 \subsection{Simulated Datasets}
 To validate the performance of the UoI$_{\text{Lasso}}$ algorithm, we performed extensive numerical investigations on simulated data sets, where we controlled key properties of the data. We benchmarked UoI$_{\text{Lasso}}$ with five other selection/estimation methods: Ridge \cite{elements}, Lasso \cite{lasso}, Smoothly Clipped Absolute Deviation (SCAD) \cite{scad}, Boostrapped Adaptive Threshold Selection (BoATS) \cite{boats}, and debiased Lasso \cite{dbLasso}. 
 
-We examined the performance of these algorithms across a variety of underlying distributions of model parameters, degrees of sparsity, and noise levels. Across all algorithms examined, we found that UoI$_{\text{Lasso}}$ (Fig. \ref{fig:simulated}, black) possessed: very high selection accuracy (Fig. \ref{fig:simulated}a); parameter estimates with low error, as quantified by $\text{RMS}=\sqrt{\frac{1}{p} \sum(\beta_i -\hat{\beta}_i)^2}$ (Fig. \ref{fig:simulated}b); the best prediction accuracy, quantified by $R^2$ (Fig. \ref{fig:simulated}c); and superior estimation variability as quantified by parameter variance, $E[\hat{\beta}^2] - E[\hat{\beta}]^2$ (Fig. \ref{fig:simulated}d). Additionally, UoI$_{\text{Lasso}}$'s high selection accuracy manifested as the most accurate model size (Fig. \ref{fig:simulated}e), which, in combination with its prediction accuracy, resulted in the best model parsimony as quantified by $\text{BIC} = -2\log \hat{\ell} + |\hat{\beta}_0| \log(n)$ (Fig. \ref{fig:simulated}f). Overall, UoI$_{\text{Lasso}}$ was robust to differences in underlying parameter distribution, degree of sparsity, and magnitude of noise.
+We examined the performance of these algorithms across a variety of underlying distributions of model parameters, degrees of sparsity, and noise levels. Across all algorithms examined, we found that UoI$_{\text{Lasso}}$ (Fig. \ref{fig:simulated}, black) possessed: very high selection accuracy (Fig. \ref{fig:simulated}a); parameter estimates with low error, (Fig. \ref{fig:simulated}b); the best prediction accuracy,  and superior estimation variability as quantified by parameter variance, (Fig. \ref{fig:simulated}d). Additionally, UoI$_{\text{Lasso}}$'s high selection accuracy manifested as the most accurate model size (Fig. \ref{fig:simulated}e), which, in combination with its prediction accuracy, resulted in the best model parsimony as quantified by (Fig. \ref{fig:simulated}f). Overall, UoI$_{\text{Lasso}}$ was robust to differences in underlying parameter distribution, degree of sparsity, and magnitude of noise.
 \begin{figure}[t]
     \centering
     \scalebox{1.05}{\includegraphics{./img/Fig3/Fig3}}
     \caption{Performance of UoI (black) compared to other models (in order: Ridge, Lasso, SCAD, BoATS, debiased Lasso) on simulated data.}
     \label{fig:simulated}
 \end{figure}
-\subsection{Sparse and Predictive Coupling Models from Non-human Primate Single-Unit Activity}
-A significant strength of UoI$_{\text{Lasso}}$ is its ability to accurately deduce the true model size. Fig. \ref{fig:simulated}e revealed that several standard approaches have a propensity to exaggerate the model size (i.e. generate false positives). Thus, we examined whether, on a real dataset, UoI$_{\text{Lasso}}$ is able to extract more parsimonious models.
 
-We considered single-unit spiking activity from primary motor cortex (M1) of Macaque monkey during self-paced reaches on a grid ($p=196$ single-units) \cite{nhp}. We binned the spike counts at 500 milliseconds and applied a square-root transform to stabilize the variance (resulting in $n=1716$ samples). Then, for each neuron $i$, we predicted the stabilized spike counts $y_i$ using the activities of the remaining neurons,
-$$
-y_i = \beta_{i0} + \sum_{j\neq i} \beta_{ij} y_j.
-$$
-The fitted parameters $\beta_{ij}$ detail the coupling structure for the population of neurons.
-
-We compared the coupling fits generated by Lasso and UoI$_{\text{Lasso}}$ for each of the 196 units. UoI$_{\text{Lasso}}$ provided considerably sparser fits, as quantified by the selection ratio (fraction of non-zero features: Fig. \ref{fig:nhp}, top-left). On average, UoI$_{\text{Lasso}}$ used 8 times fewer parameters than Lasso. However, UoI$_{\text{Lasso}}$ maintained the predictive quality across all the fits (Fig. \ref{fig:nhp}, top-right). These two observations can be summarized succinctly with the Bayesian Information Criterion (BIC), a metric for model parsimony. The difference in BIC $(\Delta$BIC = BIC$_{\text{Lasso}}-$BIC$_{\text{UoI}})$ across the model fits is shown in Fig. \ref{fig:nhp}, bottom. About a quarter of the fits exhibit little to no difference in BIC, indicating there is little evidence against the models provide by Lasso.  Meanwhile, about 70\% of the single-units have a difference in BIC of at least 10, indicating very strong evidence against Lasso as a descriptive model of the data \cite{kass1995}. Thus, UoI$_{\text{Lasso}}$ provides coupling models that are as simple as possible, but no simpler. 
-\begin{figure}[t]
-    \centering
-    \scalebox{0.55}{\includegraphics{./img/Fig5/Fig5}}
-    \caption{UoI$_{\text{Lasso}}$ generates more parsimonious coupling models of spiking data. Top left: Comparison of selection ratios (fraction of non-zero features) for each coupling fit. Each point represents one single-unit. Top right: Comparison of $R^2$ values for each coupling fit. Bottom: Difference in BIC between Lasso and UoI$_{\text{Lasso}}$.}
-    \label{fig:nhp}
-\end{figure}
-\subsection{Sparse Functional Networks from Human Neural Recordings}
+\subsection{Functional Networks from Human Neural Recordings}
 
 We sought to determine if the enhanced selection and estimation properties of UoI$_{\text{Lasso}}$ also improved its utility as a tool for data-driven discovery in complex, diverse neuroscience data sets. Thus, we tackled the problem of graph formation from multi-electrode ($p=86$ electrodes) neural recordings taken directly from the surface of the human brain during speech production ($n=45$ trials each) \cite{bouchard2013}. That is, the goal was to construct sparse neuroscientifically-meaningful graphs for further downstream analysis. To estimate functional connectivity, we calculated partial correlation graphs. The model was estimated independently for each electrode, and we compared the results of graphs estimated by UoI$_{\text{Lasso}}$ to the graphs estimated by SCAD. In Fig. \ref{fig:vsmc}a-b, we display the networks derived from recordings during the production of /b/ while speaking /ba/. We found that the UoI$_{\text{Lasso}}$ network (Fig. \ref{fig:vsmc}a) was much sparser than the SCAD network (Fig. \ref{fig:vsmc}b). Furthermore, the network extracted by UoI$_{\text{Lasso}}$ contained electrodes in the lip (dorsal vSMC), jaw (central vSMC), and larynx (ventral vSMC) regions, accurately reflecting the articulators engaged in the production of /b/ (Fig. \ref{fig:vsmc}c). The SCAD network (Fig. \ref{fig:vsmc}d) did not have any of these properties. This highlights the improved power of UoI$_{\text{Lasso}}$ to extract sparse graphs with functionally meaningful features relative to even some non-convex methods.
 \begin{figure}[t!]
@@ -145,6 +192,19 @@ We sought to determine if the enhanced selection and estimation properties of Uo
 \end{figure}
 
 We calculated connectivity graphs during the production of 9 consonant-vowel syllables. Fig. \ref{fig:vsmc}e displays a summary of prediction accuracy for UoI$_{\text{Lasso}}$ networks (red) and SCAD networks (black) as a function of time. The average relative prediction accuracy (compared to baseline times) for the UoI$_{\text{Lasso}}$ network was generally greater during the time of peak phoneme encoding ($T = \left[-100:200\right]$) compared to the SCAD network. Fig. \ref{fig:vsmc}f plots the time course of the parameter selection ratio for the UoI$_{\text{Lasso}}$ network (red) and SCAD network (black). The UoI$_{\text{Lasso}}$ network was consistently $\sim5$ times sparser than the SCAD network. These results demonstrate that UoI$_{\text{Lasso}}$ extracts sparser graphs from noisy neural signals with a modest increase in prediction accuracy compared to SCAD.
+
+
+\subsection{Sparse and Predictive Coupling Models from Nonhuman Primate Single-Unit Activity}
+A significant strength of UoI$_{\text{Lasso}}$ is its ability to accurately deduce the true model size. Our simulations revealed that several standard approaches have a propensity to exaggerate the number of non-zero parameters (i.e., generate false positives: Fig. \ref{fig:simulated}e). In coupling networks, such false positives may problematically imply the existence of functional sub-networks that do not exist. Thus, we examined whether, on a real dataset, UoI$_{\text{Lasso}}$ is able to extract more parsimonious models, demonstrating that standard methods overstate the number of functional connections.
+
+We computed coupling models on the 196 nonhuman primate M1 single-units, using  Lasso and UoI$_{\text{Lasso}}$. UoI$_{\text{Lasso}}$ provided considerably sparser fits, as quantified by the selection ratio (Fig. \ref{fig:nhp}a). On average, UoI$_{\text{Lasso}}$ used 8 times fewer parameters than Lasso. However, UoI$_{\text{Lasso}}$ maintained the predictive quality across all the fits (Fig. \ref{fig:nhp}b). These two observations can be summarized succinctly with the BIC. The difference in BIC $(\Delta$BIC = BIC$_{\text{Lasso}}-$BIC$_{\text{UoI}})$ across the model fits is depicted in Fig. \ref{fig:nhp}c. Approximately a quarter of the fits exhibit little to no difference in BIC, indicating there is little evidence against the models provide by Lasso.  Meanwhile, about 70\% of the single-units have a difference in BIC of at least 10, indicating very strong evidence against Lasso as a descriptive model of the data \cite{kass1995}. Thus, UoI$_{\text{Lasso}}$ provides coupling networks that are as simple as possible, but no simpler. 
+\begin{figure}[t]
+    \centering
+    \scalebox{0.5}{\includegraphics{./img/Fig5/Fig5}}
+    \vspace{-15pt}
+    \caption{UoI$_{\text{Lasso}}$ generates more parsimonious coupling models of spiking data. Top left: Comparison of selection ratios (fraction of non-zero features) for each coupling fit. Each point represents one single-unit. Top right: Comparison of $R^2$ values for each coupling fit. Bottom: Difference in BIC between Lasso and UoI$_{\text{Lasso}}$.}
+    \label{fig:nhp}
+\end{figure}
 
 \section{CONCLUSION}
 
@@ -171,7 +231,7 @@ In this work, we focused on neuroscience applications of UoI$_{\text{Lasso}}$. H
 
 \section*{ACKNOWLEDGMENT}
 
-P.S. Sachdeva was supported by the Department of Defense (DoD) through the National Defense Science \& Engineering Graduate Fellowship (NDSEG) Program.
+P.S. Sachdeva was supported by the Department of Defense (DoD) through the National Defense Science \& Engineering Graduate Fellowship (NDSEG) Program. K.E. Bouchard was funded by a DOE/LBNL LDRD, ``Deep Learning for Science'', (PI, Prabhat).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -184,7 +244,7 @@ P.S. Sachdeva was supported by the Department of Defense (DoD) through the Natio
 \bibitem{uoi} K. E. Bouchard, A. F. Bujan, F. Roosta-Khorasani, S. Ubaru, Prabhat, A. M. Snijders, J.-H. Mao, E. F. Chang, M. W. Mahoney, and S. Bhattacharyya. Union of Intersections (UoI) for interpretable data driven discovery and prediction, In \textit{Annual Advances in Neural Information Processing Systems, 30: Proceedings of the 2017 Conference}, 2017.
 \bibitem{elements} T. Hastie, R. Tibshirani, and J. Friedman, The Elements of Statistical Learning. Springer-Verlag, New York, 2003.
 
-\bibitem{lasso} R. Tibshirani, Regression shrinkage and selection via the lasso, \textit{Journal of the Royal Statistical Society: Series B}, vol. 58, no. 1, pp. 267-–288, 1996.
+\bibitem{lasso} R. Tibshirani, Regression shrinkage and selection via the lasso, \textit{Journal of the Royal Statistical Society: Series B}, vol. 58, no. 1, 1996.
 
 \bibitem{scad} J. Fan and R. Li, Variable selection via nonconcave penalized likelihood and its oracle properties, Journal of the American Statistical Association, vol. 96 no. 456, pp. 1348–-1360, 2001.
 
