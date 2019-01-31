@@ -84,7 +84,7 @@ The increasing size and complexity of neuroscientific and biomedical data could 
 
 An important neuroscientific application that requires is network estimation from data (i.e., ``functional connectomics''). In functional connectomics, a core problem is determining the adjacency matrix. Statistically, this is equivalent to feature selection (i.e., which edges are non-zero, Fig.  \ref{fig:intro}b). While ad-hoc thresholding can be performed, such approaches are often set by hand and defy rigorous understanding. Likewise, statistically biased estimates can result in incorrectly inferred dynamics or under-estimated spike rates. These issues are fundamental to many neuroscientific data analyses and the interpretation thereof.
 
-\begin{figure}[b!]
+\begin{figure}[b]
     \vspace{-15pt}
     \centering
     \scalebox{0.54}{\includegraphics{./img/Fig1/Fig1}}
@@ -95,13 +95,11 @@ An important neuroscientific application that requires is network estimation fro
 
 We present the Union of Intersections (UoI) framework, a novel statistical approach we have recently introduced that addresses these issues \cite{uoi}. The algorithms enhanced by UoI (e.g., regression, classification, dimensionality reduction) are ubiquitous in systems neuroscience. Here, in real neuroscience analysis problems, we demonstrate qualitatively and quantitatively different results when using UoI-based methods compared to ``standard'' methods.  Thus, the foundational statistical improvements of UoI-based methods will potentially have significant impacts across neuroscience.
 
-\begin{figure}[t!]
-    \vspace{-15pt}
+\begin{figure}[t]
     \centering
-    \scalebox{0.54}{\includegraphics{./img/Fig2/Fig2}}
-    \vspace{-20pt}
-    \caption{Functional Coupling}
-    \label{fig:intro}
+    \scalebox{0.6}{\includegraphics{./img/Fig2/Fig2}}
+    \caption{Functional coupling models express the activity of a neuron/electrode as a function of neighboring neurons/electrodes (right). Such models can be used to create partial correlation graphs (left).}
+    \label{fig:functional_coupling}
 \end{figure}
 
 \section{METHODS}
