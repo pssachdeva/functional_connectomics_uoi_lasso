@@ -173,11 +173,11 @@ Thus, the selection module ensures that, for each $\lambda_j$, only features tha
 We evaluated all algorithms with the following metrics:
 \begin{itemize}
     \item \textbf{Selection Accuracy:} $1-\frac{\vert S_{\hat{\beta}} \Delta S_{\beta}\vert}{|S_{\hat{\beta}}\vert + \vert S_{\beta} \vert}$, where $\Delta$ is the symmetric set difference operator and $|S|$ is the cardinality of $S$. This metric is bounded in $[0, 1]$, taking value $0$ if $S_{\hat{\beta}}$ and $S_{\beta}$ have no elements in common, and taking value $1$ iff they are identical.
-    \item \textbf{Selection Ratio:} Fraction of non-zero features. Alternatively, we refer to the model size, or the number of non-zero features.
+    \item \textbf{Selection Ratio:} The fraction of non-zero fitted features to the number of available . Alternatively, we refer to the model size, or the number of fitted non-zero features.
     \item \textbf{Estimation Error:} $\sqrt{\frac{1}{p} \sum (\beta_i - \hat{\beta}_i)^2}$ (i.e., rms error).
     \item \textbf{Estimation variability:} $\text{var}[\hat{\beta}]$, taken across resamples of the data.
     \item \textbf{Prediction Accuracy:} $\frac{\sum \left(y_i - \hat{y}_i\right)^2}{\sum \left(y_i - E[y]\right)^2}$ (i.e., $R^2$).
-    \item \textbf{Model Parsimony:} Bayesian Information Criterion (BIC), defined as $\text{BIC} = -2\log \hat{L} + |\hat{\beta}|_0 \log(n)$, where $\hat{L}$ is the likelihood of the test set and $|\cdot|_0$ denotes the $\ell_0$-norm. Lower BIC is indicative of a predictive model using fewer features and thus is preferred.
+    \item \textbf{Model Parsimony:} Bayesian Information Criterion (BIC), defined as $\text{BIC} = -2\log \hat{L} + |\hat{\beta}|_0 \log(n)$, where $\hat{L}$ is the likelihood of the test set and $|\cdot|_0$ denotes the $\ell_0$-norm. Lower BIC, indicative of a predictive model using fewer features, is preferred.
 \end{itemize}
 \section{RESULTS}
 \subsection{Simulated Datasets}
@@ -201,18 +201,18 @@ We sought to determine if the enhanced selection and estimation properties of Uo
     \label{fig:vsmc}
 \end{figure}
 
-We calculated connectivity graphs during the production of 9 consonant-vowel syllables. Fig. \ref{fig:vsmc}e displays a summary of prediction accuracy for UoI$_{\text{Lasso}}$ networks (red) and SCAD networks (black) as a function of time. The average relative prediction accuracy (compared to baseline times) for the UoI$_{\text{Lasso}}$ network was generally greater during the time of peak phoneme encoding ($T = \left[-100:200\right]$) compared to the SCAD network. Fig. \ref{fig:vsmc}f plots the time course of the parameter selection ratio for the UoI$_{\text{Lasso}}$ network (red) and SCAD network (black). The UoI$_{\text{Lasso}}$ network was consistently $\sim5$ times sparser than the SCAD network. These results demonstrate that UoI$_{\text{Lasso}}$ extracts sparser graphs from noisy neural signals with a modest increase in prediction accuracy compared to SCAD.
+We calculated connectivity graphs during the production of 9 consonant-vowel syllables. Fig. \ref{fig:vsmc}e displays a summary of prediction accuracy for UoI$_{\text{Lasso}}$ networks (red) and SCAD networks (black) as a function of time. The average relative prediction accuracy (compared to baseline times) for the UoI$_{\text{Lasso}}$ network was generally greater during the time of peak phoneme encoding ($T = \left[-100:200\right]$) compared to the SCAD network. Fig. \ref{fig:vsmc}f plots the time course of the parameter selection ratio for the UoI$_{\text{Lasso}}$ network (red) and SCAD network (black). The UoI$_{\text{Lasso}}$ network was consistently 5 times sparser than the SCAD network. These results demonstrate that UoI$_{\text{Lasso}}$ extracts sparser graphs from noisy neural signals with a modest increase in prediction accuracy compared to SCAD.
 
 
 \subsection{Sparse and Predictive Coupling Models from Nonhuman Primate Single-Unit Activity}
-A significant strength of UoI$_{\text{Lasso}}$ is its ability to accurately deduce the true model size. Our simulations revealed that several standard approaches have a propensity to exaggerate the number of non-zero parameters (i.e., generate false positives: Fig. \ref{fig:simulated}e). In coupling networks, such false positives may problematically imply the existence of functional sub-networks that do not exist. Thus, we examined whether, on a real dataset, UoI$_{\text{Lasso}}$ is able to extract more parsimonious models, demonstrating that standard methods overstate the number of functional connections.
+A significant strength of UoI$_{\text{Lasso}}$ is its ability to accurately deduce the true model size. Our simulations revealed that several standard approaches have a propensity to exaggerate the number of non-zero parameters (i.e., generate false positives: Fig. \ref{fig:simulated}e). In coupling models, such false positives may problematically imply the existence of functional sub-networks that do not exist. Thus, we examined whether, on an additional dataset, UoI$_{\text{Lasso}}$ is able to extract more parsimonious models, demonstrating that standard methods overstate the number of functional connections.
 
 We computed coupling models on the 196 nonhuman primate M1 single-units, using  Lasso and UoI$_{\text{Lasso}}$. UoI$_{\text{Lasso}}$ provided considerably sparser fits (Fig. \ref{fig:nhp}a). On average, UoI$_{\text{Lasso}}$ used 8 times fewer parameters than Lasso. However, UoI$_{\text{Lasso}}$ maintained the predictive quality across all the fits (Fig. \ref{fig:nhp}b). These two observations can be summarized succinctly with the BIC. The difference in BIC $(\Delta$BIC = BIC$_{\text{Lasso}}-$BIC$_{\text{UoI}})$ across the model fits is depicted in Fig. \ref{fig:nhp}c. Approximately a quarter of the fits exhibit almost no difference in BIC, indicating there is little evidence against the models provide by Lasso.  Meanwhile, about 70\% of the single-units have a difference in BIC of at least 10, indicating very strong evidence against Lasso as a descriptive model of the data \cite{kass1995}. Thus, UoI$_{\text{Lasso}}$ provides coupling networks that are as simple as possible, but no simpler. 
 \begin{figure}[t]
     \centering
     \scalebox{0.40}{\includegraphics{./img/Fig6/Fig6}}
     \vspace{-15pt}
-    \caption{UoI$_{\text{Lasso}}$ generates more parsimonious coupling models of spiking data. Top left: Comparison of selection ratios (fraction of non-zero features) for each coupling fit. Each point represents one single-unit. Top right: Comparison of $R^2$ values for each coupling fit. Bottom: Difference in BIC between Lasso and UoI$_{\text{Lasso}}$.}
+    \caption{UoI$_{\text{Lasso}}$ generates more parsimonious coupling models of single-unit activity. \textbf{a.} Comparison of selection ratios across the 196 coupling fits. \textbf{b.} Comparison of (cross-validated) $R^2$ values for each coupling fit. \textbf{c.} Comparison of BIC across model fits ($\Delta\text{BIC}=\text{BIC}_{\text{Lasso}} - \text{BIC}_{\text{UoI}}$).}
     \label{fig:nhp}
 \end{figure}
 
